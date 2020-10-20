@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react'
 
+export type position = [number, number]
+
 const useDraggable = () => {
   const [isMove, setIsMove] = useState<boolean>(false)
-  const [mousePosition, setMousePosition] = useState<[number, number]>([0, 0])//鼠标的坐标
-  const [divPosition, setDivPosition] = useState<[number, number]>([0, 0])//div的坐标
+  const [mousePosition, setMousePosition] = useState<position>([0, 0])//鼠标的坐标
+  const [divPosition, setDivPosition] = useState<position>([0, 0])//div的坐标
   const Ref = useRef<any>(null)
   const MouseDown = (e: React.MouseEvent) => {
     e.preventDefault()

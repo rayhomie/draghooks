@@ -1,62 +1,60 @@
-import React, { useRef, useState, useEffect, createRef } from 'react'
+import React, { useRef, useEffect, createRef } from 'react'
 
 export type position = [number, number]
 
 const useArrdraggable = (dataSource: Array<any>) => {
-  const [positionArr, setPositionArr] = useState<Array<position>>([])
-  const [mousePosition, setMousePosition] = useState<position>([0, 0])//鼠标的坐标
-  const [isMove, setIsMove] = useState<boolean[]>([])
   const storeAllRef = useRef<any>(null)
+  const ISMOVE = useRef<boolean[]>([])
+  const POSITIONARR = useRef<Array<position>>([])
+  const MOUSEPOSITION = useRef<position>([0, 0])
 
   useEffect(() => {//div坐标获取
-    // console.log(isMove)
-    // console.log(storeAllRef.current)
     const Store = storeAllRef.current as Array<any>
     const position: Array<position> = []
     Store.forEach((v, i) => {
       position.push([v.current.offsetLeft, v.current.offsetTop])
       v.current.style.position = 'absolute'
+      v.current.style.zIndex = 0
+      v.current.addEventListener('mousedown', (e: any) => { MouseDown(e, i) })
+      v.current.addEventListener('mousemove', (e: any) => { MouseMove(e, i) })
+      v.current.addEventListener('mouseup', (e: any) => { MouseUp(e, i) })
     })
-    setPositionArr(position)
-  }, [isMove])
-
-  useEffect(() => {//初始化isMove
-    setIsMove(isMoveArr)
+    POSITIONARR.current = position
+    ISMOVE.current = isMoveArr
   }, [])
 
-  useEffect(() => {//div坐标实时
-    // console.log(positionArr)
-  }, [positionArr])
-
-  const MouseDown = (e: React.MouseEvent, index: number) => {
+  const MouseDown = (e: any, index: number) => {
     e.preventDefault()
-    storeAllRef.current[index].current.style.cursor = 'move'
-    const isMoveArr = [...isMove]
+    const isMoveArr = [...ISMOVE.current]
+    MOUSEPOSITION.current = [e.clientX, e.clientY]
     isMoveArr[index] = true
-    setIsMove(isMoveArr)
-    setMousePosition([e.clientX, e.clientY])
-  }
-
-  const MouseMove = (e: React.MouseEvent, index: number) => {
-    e.preventDefault()
-    const isMoveArr = [...isMove]
-    if (!isMoveArr[index]) return
-    const [mouseX, mouseY] = [e.clientX, e.clientY]
-    storeAllRef.current[index].current.style.left = `${positionArr[index][0] + mouseX - mousePosition[0]}px`
-    storeAllRef.current[index].current.style.top = `${positionArr[index][1] + mouseY - mousePosition[1]}px`
-  }
-
-  const MouseUp = (e: React.MouseEvent, index: number) => {
-    e.preventDefault()
-    storeAllRef.current[index].current.style.cursor = 'default'
-    const isMoveArr = [...isMove]
-    isMoveArr[index] = false
-    setIsMove(isMoveArr)
-    const curPos = [...positionArr]
+    ISMOVE.current = isMoveArr
+    const curPos = [...POSITIONARR.current]
     curPos[index][0] = storeAllRef.current[index].current.offsetLeft
     curPos[index][1] = storeAllRef.current[index].current.offsetTop
-    // console.log(curPos)
-    setPositionArr(curPos)
+    POSITIONARR.current = curPos
+    storeAllRef.current[index].current.style.cursor = 'move'
+    storeAllRef.current[index].current.style.zIndex = 999
+  }
+
+  const MouseMove = (e: any, index: number) => {
+    e.preventDefault()
+    const isMoveArr = [...ISMOVE.current]
+    if (isMoveArr[index] === false) {
+      return;
+    }
+    const [mouseX, mouseY] = [e.clientX, e.clientY]
+    storeAllRef.current[index].current.style.left = `${POSITIONARR.current[index][0] + mouseX - MOUSEPOSITION.current[0]}px`
+    storeAllRef.current[index].current.style.top = `${POSITIONARR.current[index][1] + mouseY - MOUSEPOSITION.current[1]}px`
+  }
+
+  const MouseUp = (e: any, index: number) => {
+    e.preventDefault()
+    const isMoveArr = [...ISMOVE.current]
+    isMoveArr[index] = false
+    ISMOVE.current = isMoveArr
+    storeAllRef.current[index].current.style.zIndex = 0
+    storeAllRef.current[index].current.style.cursor = 'default'
   }
 
   const isMoveArr: boolean[] = []
@@ -77,9 +75,6 @@ const useArrdraggable = (dataSource: Array<any>) => {
           }}
           onClick={() => { }}
           ref={allRef[index]}
-          onMouseDown={(e) => { MouseDown(e, index) }}
-          onMouseMove={(e) => { MouseMove(e, index) }}
-          onMouseUp={(e) => { MouseUp(e, index) }}
         >
           {item}
         </div>

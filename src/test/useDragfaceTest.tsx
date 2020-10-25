@@ -4,7 +4,7 @@ interface PropTypes { }
 type position = [number, number]
 const dataSource = [1, 2, 3, 4, 5, 6]
 
-const UseDraglineTest: React.FC<PropTypes> = (props) => {
+const UseDragfaceTest: React.FC<PropTypes> = (props) => {
   const storeAllRef = useRef<any>(null)
   const ISMOVE = useRef<boolean[]>([])
   const POSITIONARR = useRef<Array<position>>([])
@@ -57,8 +57,6 @@ const UseDraglineTest: React.FC<PropTypes> = (props) => {
     ISMOVE.current = isMoveArr
     storeAllRef.current[index].current.style.zIndex = 0
     storeAllRef.current[index].current.style.cursor = 'default'
-    console.log(storeAllRef.current[index - 1]?.current.offsetTop, storeAllRef.current[index].current.offsetTop, storeAllRef.current[index + 1]?.current.offsetTop);
-
   }
 
   const isMoveArr: boolean[] = []
@@ -97,4 +95,4 @@ const UseDraglineTest: React.FC<PropTypes> = (props) => {
   )
 }
 
-export default UseDraglineTest
+export default UseDragfaceTest
